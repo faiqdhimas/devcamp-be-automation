@@ -1,0 +1,19 @@
+target/*
+test_report/*
+logs/*
+logs/*
+.vscode/*
+.idea/*
+target/test-classes/env.properties
+# dashboard.html
+# index.html
+index.html.gz
+.DS_Store
+# html-report.gz
+# log-report.gz
+/target/
+.classpath
+.project
+.settings/
+src/test/resources/LoginInfo.properties
+test.log

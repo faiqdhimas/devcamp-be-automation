@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="Tokopedia Suite" thread-count="1" parallel="classes">
+<suite name="BE Automation Suite" thread-count="1" parallel="classes">
     <test name="On Demand - Single Test Case Report" >
         <classes>
-            <class name="devcamp.FirstTestCase">
+            <class name="com.tokopedia.devcamp.sample.api.TestUniversity">
             </class>
         </classes>
     </test> <!-- Test -->
