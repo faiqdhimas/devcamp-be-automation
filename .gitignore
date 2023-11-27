@@ -5,12 +5,12 @@ logs/*
 .vscode/*
 .idea/*
 target/test-classes/env.properties
-# dashboard.html
-# index.html
+dashboard.html
+index.html
 index.html.gz
 .DS_Store
-# html-report.gz
-# log-report.gz
+html-report.gz
+log-report.gz
 /target/
 .classpath
 .project

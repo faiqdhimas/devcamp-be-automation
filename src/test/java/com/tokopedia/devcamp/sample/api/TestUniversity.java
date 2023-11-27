@@ -1,63 +1,117 @@
 package com.tokopedia.devcamp.sample.api;
 
-import java.util.HashMap;
-
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.tokopedia.devcamp.objects.display.pojo.university.UniversityDetail;
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
+import com.tokopedia.devcamp.services.UniversityService;
+import com.tokopedia.devcamp.utilities.HelperLogger;
 
-public class TestUniversity {
+import framework.baseClasses.BaseTest;
+import framework.listeners.JiraID;
+
+/*
+*  curl --location --request GET
+*  http://universities.hipolabs.com/search?name=institut&country=indonesia
+*/
+public class TestUniversity extends BaseTest{
     
-    // curl --location --request GET 'http://universities.hipolabs.com/search?country=Indonesia'
-
-    private String api_path;
     private String name, country, domain;
-    private HashMap<String, Object> headerMap = new HashMap<>();
     private UniversityDetail[] univ_resp;
+    private UniversityService univ_service;
+    private HelperLogger logger;
 
     @BeforeTest
 	public void setUpTestData() {
         // Perform setup operations here before running the tests
-        RestAssured.baseURI = "http://universities.hipolabs.com";
-        api_path = "/search";
-    }
-
-    public TestUniversity(){
-        this.headerMap.put("Content-Type", "application/json");
+        univ_service = new UniversityService();
+        logger = new HelperLogger();
     }
 
     @Test(priority = 1)
-    public void testUniversityIndonesia() throws JsonMappingException, JsonProcessingException{
+    @JiraID(id="BTCM-12345")
+    public void testInstitutIndonesiaUniv() {
+        name = "Institut";
         country = "Indonesia";
+        univ_resp = univ_service.search(name, country);
 
-        // Perform the GET request
-        Response response = RestAssured.given()
-                .queryParam("country", country)
-                .header("Content-Type", "application/json")
-                .when()
-                .get(api_path);
-                
-        System.out.println("Response REST: "+ response.getBody().asString());
-
-        univ_resp = response.as(UniversityDetail[].class);
-
-        // Assertion: Verify that the Country and Name are correct and not null.
-        for(int i = 0; i < univ_resp.length; i++) {
-
-            name = univ_resp[i].getName();
-            country = univ_resp[i].getCountry();
-            domain = univ_resp[i].getDomains().get(0);
-            System.out.println(i + ". xValidate: "+name+ " - "+ country+ " - "+ domain);
-
-            Assert.assertEquals(country, "Indonesia", "Country not match");
-            Assert.assertNotNull(name, "name is empty");
-            Assert.assertNotNull(domain, "domain is empty");
-        }
+        validateUniversityDetails(univ_resp, name, country);
     }
+
+    @Test(priority = 2)
+    public void testInstitutUniv() {
+        name = "Institut";
+        univ_resp = univ_service.searchName(name);
+
+        validateUniversityDetails(univ_resp, name, "");
+    }
+
+    @Test(priority = 3)
+    public void testIndonesiaUniv() {
+        country = "Indonesia";
+        univ_resp = univ_service.searchCountry(country);
+
+        validateUniversityDetails(univ_resp, "", country);
+    }
+
+    @Test(priority = 4, dataProvider = "invalidCasesUniversity")
+    public void testInvalidUniv(String name, String country) { // Negative case
+        univ_resp = univ_service.search(name, country);
+        
+        Assert.assertTrue(univ_resp.length == 0, "Array is not empty for "+ name + " " + country);
+    }
+
+    @DataProvider(name = "invalidCasesUniversity")
+    public Object[][] invalidCasesUniversity(){
+        return new Object[][]{
+                {"Inst!tut", "Indonesia"},
+                {"Institut", "XYZ"},
+                {"NonExistentUni", "Indonesia"},
+                {"123", "Indonesia"},
+                {"University", "NonExistentCountry"}
+        };
+    }
+
+    private void validateUniversityDetails(UniversityDetail[] universities, String filterName, String filterCountry) {
+        
+        for (int i = 0; i < universities.length; i++) {
+            name = universities[i].getName();
+            country = universities[i].getCountry();
+            domain = universities[i].getDomains().get(0);
+            System.out.println(i + ". Validate: " + name + " - " + country + " - " + domain);
+
+            // log for case 1 (search by name & country)
+            if ( filterName.length() > 0 && filterCountry.length() > 0 ){
+                logger.SendLog(i + ". Univ Detail: " + name + ";" + domain);
+            }
+
+            // log for case 2 (search by name)
+            if ( filterCountry.isEmpty() && filterName.length() > 0 ){
+                logger.SendLog(i + ". Univ Detail: " +name+ " - "+ country);
+            }
+
+            // log for case 3 (search by country)
+            if ( filterName.isEmpty() && filterCountry.length() > 0 ){
+                if (name.contains("Negeri")) {
+                    logger.SendLog(i + ". PTN Detail: " + name + ";" + domain);
+                }
+            }
+    
+            // Assertion: Verify that the country and name are correct and not empty
+            Assert.assertEquals(country, "Indonesia", "Country does not match");
+            Assert.assertNotNull(name, "Name is empty");
+            Assert.assertNotNull(domain, "Domain is empty");
+        }
+    
+        logger.SendLog("All good");
+    }
+
+
+    @Override
+    public void cleanUpTestData() {
+        // TODO Auto-generated method stub
+    }
+
 }

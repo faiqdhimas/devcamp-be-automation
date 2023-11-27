@@ -288,6 +288,11 @@
 			<version>2.8.1</version>
 		</dependency>
 		<dependency>
+			 <groupId>TestFramework</groupId>
+			 <artifactId>Trex2.0-core</artifactId>
+			 <version>1.4-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
 			<version>3.24.4</version>
