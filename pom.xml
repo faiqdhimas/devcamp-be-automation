@@ -291,6 +291,8 @@
 			 <groupId>TestFramework</groupId>
 			 <artifactId>Trex2.0-core</artifactId>
 			 <version>1.4-SNAPSHOT</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/bin/devcamp-be-automation-1.0-SNAPSHOT.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
