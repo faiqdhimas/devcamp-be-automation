@@ -7,12 +7,8 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 @Getter @Setter @NoArgsConstructor @JsonIgnoreProperties(ignoreUnknown = true)
 public class UniversityDetail {
-
-    @JsonProperty(value="web_pages")
-    private ArrayList<String> web_pages;
 
     @JsonProperty(value="name")
     private String name;
@@ -28,4 +24,7 @@ public class UniversityDetail {
 
     @JsonProperty(value="domains")
     private ArrayList<String> domains;
+
+    @JsonProperty(value="web_pages")
+    private ArrayList<String> web_pages;
 }

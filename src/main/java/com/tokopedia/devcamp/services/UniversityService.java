@@ -4,7 +4,11 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
 import java.util.HashMap;
+import java.util.Map;
+
 import com.tokopedia.devcamp.objects.display.pojo.university.UniversityDetail;
+
+import framework.utilities.http.HttpClient;
 
 /*
 *  curl --location --request GET
@@ -15,7 +19,10 @@ public class UniversityService {
     String host = "http://universities.hipolabs.com";
     String apiPathSearch = "/search";
     HashMap<String, Object> headerMap = new HashMap<>();
- 
+    Map<String, String> headerMaps = new HashMap<>();
+    HttpClient client = new HttpClient();
+    Response response;    
+
     public UniversityService() {
       RestAssured.baseURI = host;
       this.headerMap.put("Content-Type", "application/json");
@@ -29,10 +36,11 @@ public class UniversityService {
       return this.search("", country);
    }
 
+   // Example using Rest Assured
    public UniversityDetail[] search(String name, String country) {
 
       // Perform the GET request
-      Response response = RestAssured.given()
+      response = RestAssured.given()
          .queryParam("name", name)
          .queryParam("country", country)
          .header("Content-Type", "application/json")
@@ -44,4 +52,15 @@ public class UniversityService {
       return response.as(UniversityDetail[].class);
     }
 
+    // Example using HTTP Client
+    public UniversityDetail[] searchHttp(String name, String country){
+
+      // Perform the GET request
+      headerMaps.put("Content-Type", "application/json");
+      apiPathSearch += "?name=" + name + "&country=" + country;
+      UniversityDetail[] univdetailresp = client.get(new HashMap(), new HashMap(), headerMaps, apiPathSearch, host, UniversityDetail[].class);
+
+      return univdetailresp;
+    }
+    
 }

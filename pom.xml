@@ -290,7 +290,7 @@
 		<dependency>
 			 <groupId>TestFramework</groupId>
 			 <artifactId>Trex2.0-core</artifactId>
-			 <version>1.4-SNAPSHOT</version>
+			 <version>1.2-SNAPSHOT</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/bin/Trex2.0-core-1.2-SNAPSHOT.jar</systemPath>
 		</dependency>

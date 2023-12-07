@@ -35,8 +35,8 @@ public class TestUniversity extends BaseTest{
     public void testInstitutIndonesiaUniv() {
         name = "Institut";
         country = "Indonesia";
-        univ_resp = univ_service.search(name, country);
-
+        // univ_resp = univ_service.search(name, country);
+        univ_resp = univ_service.searchHttp(name, country);
         validateUniversityDetails(univ_resp, name, country);
     }
 
@@ -67,7 +67,7 @@ public class TestUniversity extends BaseTest{
     public Object[][] invalidCasesUniversity(){
         return new Object[][]{
                 {"Inst!tut", "Indonesia"},
-                {"Institut", "XYZ"},
+                {"Inst!tut", "XYZ"},
                 {"NonExistentUni", "Indonesia"},
                 {"123", "Indonesia"},
                 {"University", "NonExistentCountry"}
@@ -111,6 +111,11 @@ public class TestUniversity extends BaseTest{
 
     @Override
     public void cleanUpTestData() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void invokeCleanUpTestData() {
         // TODO Auto-generated method stub
     }
 

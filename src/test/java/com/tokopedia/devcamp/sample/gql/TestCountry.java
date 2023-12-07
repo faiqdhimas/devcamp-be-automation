@@ -5,12 +5,12 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.tokopedia.devcamp.objects.display.pojo.university.UniversityDetail;
+import com.tokopedia.devcamp.objects.display.pojo.country.CountryDetailArray;
+import com.tokopedia.devcamp.objects.display.pojo.country.CountryDetailObject;
 import com.tokopedia.devcamp.services.CountriesService;
 import com.tokopedia.devcamp.utilities.HelperLogger;
 
 import framework.baseClasses.BaseTest;
-import io.restassured.response.Response;
 
 /*
 *  GraphQL API
@@ -18,39 +18,26 @@ import io.restassured.response.Response;
 */
 public class TestCountry extends BaseTest{
     
-    private String name, domain;
-    private UniversityDetail[] univ_resp;
-
-    //pojostarwars belummm
     private CountriesService country;
     private HelperLogger logger;
+    private CountryDetailObject country_response_object;
+    private CountryDetailArray country_response_array;
     
     @BeforeTest
 	public void setUpTestData() {
         // Perform setup operations here before running the tests
         country = new CountriesService();
         logger = new HelperLogger();
+        country_response_object = new CountryDetailObject();
+        country_response_array = new CountryDetailArray();
     }
 
-    // @Test(dataProvider = "ValidCountryGraphQLQuery")
+    @Test(dataProvider = "ValidCountryGraphQLQuery")
     public void testValidCountryCodeGraphQLQuery(String country_id, String expected_country) {
 
-        Response response = country.getCountryByCode(country_id);
-
-        int statusCode = response.getStatusCode();
-        Assert.assertEquals(statusCode, 200, "Failed to execute GraphQL query. Status code: " + statusCode);
-
-        String responseBody = response.getBody().asString();
-        System.out.println("Country Response Bodyyy: " + responseBody);
-
-        // Validate hasil query sesuai dengan respons yang diharapkan
-        Assert.assertTrue(responseBody.contains("country"), "Response does not contain expected data");
-        Assert.assertFalse(responseBody.contains("errors"), "Response contains errors");
-        Assert.assertTrue(responseBody.contains("name"), "Response does not contain country name");
-        Assert.assertTrue(responseBody.contains("code"), "Response does not contain country code");
-        Assert.assertTrue(responseBody.contains("capital"), "Response does not contain country capital");
-        Assert.assertTrue(responseBody.contains("currency"), "Response does not contain country currency");
-        Assert.assertTrue(responseBody.contains("languages"), "Response does not contain country languages");
+        country_response_object = country.getCountryByCode(country_id);
+        logger.SendLog(country_response_object + "-" + country_id + "-" + expected_country);
+        validateCountryDetails(country_response_object, country_id, "", expected_country);
     }
 
     @DataProvider(name = "ValidCountryGraphQLQuery")
@@ -67,22 +54,9 @@ public class TestCountry extends BaseTest{
     @Test(dataProvider = "ValidCountryCurGraphQLQuery")
     public void testValidCountryCurrencyGraphQLQuery(String currency, String expected_country) {
 
-        Response response = country.getCountryByCurrency(currency);
-
-        int statusCode = response.getStatusCode();
-        Assert.assertEquals(statusCode, 200, "Failed to execute GraphQL query. Status code: " + statusCode);
-
-        String responseBody = response.getBody().asString();
-        System.out.println("Currency Response Bodyyy: " + responseBody);
-
-        // Validate hasil query sesuai dengan respons yang diharapkan
-        // Assert.assertTrue(responseBody.contains("country"), "Response does not contain expected data");
-        Assert.assertFalse(responseBody.contains("errors"), "Response contains errors");
-        Assert.assertTrue(responseBody.contains("name"), "Response does not contain country name");
-        Assert.assertTrue(responseBody.contains("code"), "Response does not contain country code");
-        Assert.assertTrue(responseBody.contains("capital"), "Response does not contain country capital");
-        Assert.assertTrue(responseBody.contains("currency"), "Response does not contain country currency");
-        Assert.assertTrue(responseBody.contains("languages"), "Response does not contain country languages");
+        country_response_array = country.getCountryByCurrency(currency);
+        logger.SendLog(country_response_array + "-" + currency + "-" + expected_country);
+        validateCountryDetails2(country_response_array, "", currency, expected_country);
     }
 
     @DataProvider(name = "ValidCountryCurGraphQLQuery")
@@ -95,8 +69,39 @@ public class TestCountry extends BaseTest{
         };
     }
 
+    private void validateCountryDetails(CountryDetailObject country, String country_id, String country_cur, String expected_name) {
+        
+        String country_capital = country_response_object.getData().getCountry().getCapital();
+        String country_name = country_response_object.getData().getCountry().getName();
+        String country_currency = country_response_object.getData().getCountry().getCurrency();
+        String country_code = country_response_object.getData().getCountry().getCode();
+
+        Assert.assertEquals(country_name, expected_name);
+        Assert.assertNotNull(country_capital, "Capital is empty");
+        Assert.assertNotNull(country_currency, "Currency is empty");
+        Assert.assertNotNull(country_code, "Code is empty");
+    }
+
+    private void validateCountryDetails2(CountryDetailArray country, String country_id, String country_cur, String expected_name) {
+        
+        String country_capital = country_response_array.getData().getCountries().get(0).getCapital();
+        String country_name = country_response_array.getData().getCountries().get(0).getName();
+        String country_currency = country_response_array.getData().getCountries().get(0).getCurrency();
+        String country_code = country_response_array.getData().getCountries().get(0).getCode();
+
+        Assert.assertEquals(country_name, expected_name);
+        Assert.assertNotNull(country_capital, "Capital is empty");
+        Assert.assertNotNull(country_currency, "Currency is empty");
+        Assert.assertNotNull(country_code, "Code is empty");
+    }
+
     @Override
     public void cleanUpTestData() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void invokeCleanUpTestData() {
         // TODO Auto-generated method stub
     }
 

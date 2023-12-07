@@ -3,8 +3,8 @@ package com.tokopedia.devcamp.services;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
-import java.util.HashMap;
-import com.tokopedia.devcamp.objects.display.pojo.university.UniversityDetail;
+import com.tokopedia.devcamp.objects.display.pojo.country.CountryDetailArray;
+import com.tokopedia.devcamp.objects.display.pojo.country.CountryDetailObject;
 
 /*
 *  GraphQL API
@@ -19,7 +19,7 @@ public class CountriesService {
       RestAssured.baseURI = BASE_URL;
     }
 
-   public Response getCountryByCode(String countryCode) {
+   public CountryDetailObject getCountryByCode(String countryCode) {
       
       String variableName = "countryCode";
       String query = "query GetCountryByCode($countryCode: ID!) { "
@@ -30,7 +30,7 @@ public class CountriesService {
       return this.executeGraphQLQuery(query, variableName, countryCode);
     }
 
-    public Response getCountryByCurrency(String currency) {
+    public CountryDetailArray getCountryByCurrency(String currency) {
 
       String variableName = "currency";
       String query = "query GetCountryByCurrency($currency: String!) { "
@@ -38,16 +38,32 @@ public class CountriesService {
       + "name code capital currency languages { name }"
       + "} }";
 
-      return this.executeGraphQLQuery(query, variableName, currency);
+      return this.executeGraphQLQuery2(query, variableName, currency);
     }
 
-    public static Response executeGraphQLQuery(String query, String variableName, String variableValue) {
+    public static CountryDetailObject executeGraphQLQuery(String query, String variableName, String variableValue) {
 
-      return RestAssured.given()
+      Response response = RestAssured.given()
               .contentType("application/json")
               .body("{\"query\": \"" + query + "\", \"variables\": {\"" + variableName + "\": \"" + variableValue + "\"}}")
               .when()
               .post();
+
+      response.then().statusCode(200);
+      System.out.println("Response Service1: "+ response.body().asString());
+      return response.as(CountryDetailObject.class);
     }
 
+    public static CountryDetailArray executeGraphQLQuery2(String query, String variableName, String variableValue) {
+
+      Response response = RestAssured.given()
+              .contentType("application/json")
+              .body("{\"query\": \"" + query + "\", \"variables\": {\"" + variableName + "\": \"" + variableValue + "\"}}")
+              .when()
+              .post();
+
+      response.then().statusCode(200);
+      System.out.println("Response Service2: "+ response.body().asString());
+      return response.as(CountryDetailArray.class);
+    }
 }
